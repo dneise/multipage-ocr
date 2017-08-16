@@ -35,11 +35,11 @@ def main(args):
         dir='.'
     )
 
-    for i in trange(num_pages):
+    for page_number in trange(num_pages):
         tmp_file_path = os.path.join(
             tmp_dir,
             '{page:010d}.{imageformat}'.format(
-                page=i,
+                page=page_number,
                 imageformat=args['--imageformat']
             )
         )
@@ -53,12 +53,14 @@ def main(args):
             density=args['--density'],
             depth=args['--depth'],
             input_path=args['<input_path>'],
-            page=i,
+            page=page_number,
             tmp_file_path=tmp_file_path
             )
         os.system(cmd)
 
-        text_file_path = os.path.join(tmp_dir, '{page:010d}'.format(page=i))
+        text_file_path = os.path.join(tmp_dir, '{page:010d}'.format(
+            page=page_number)
+        )
 
         cmd = '''tesseract \
         -psm {psm} \
