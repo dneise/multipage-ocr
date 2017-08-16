@@ -19,6 +19,7 @@ from tqdm import trange
 from glob import glob
 from io import StringIO
 from joblib import Parallel, delayed
+import time
 
 
 def convert_one_page(args, page_number, tmp_dir):
@@ -70,8 +71,12 @@ def main(args):
     assert args['<input_path>'].endswith(".pdf")
 
     num_pages = PdfFileReader(open(args['<input_path>'], 'rb')).getNumPages()
+
     tmp_dir = tempfile.mkdtemp(
-        prefix='multipage_ocr_temp_',
+        prefix='{timestamp}_{inputfilebase}_mocr_'.format(
+            timestamp=time.strftime('%Y%m%d%H%M'),
+            inputfilebase=os.path.split(args['<input_path>'])[1],
+            ),
         dir='.'
     )
 
