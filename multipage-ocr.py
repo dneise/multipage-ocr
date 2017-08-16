@@ -18,6 +18,46 @@ from PyPDF2 import PdfFileReader
 from tqdm import trange
 from glob import glob
 from io import StringIO
+from joblib import Parallel, delayed
+
+
+def convert_one_page(args, page_number, tmp_dir):
+    tmp_file_path = os.path.join(
+        tmp_dir,
+        '{page:010d}.{imageformat}'.format(
+            page=page_number,
+            imageformat=args['--imageformat']
+        )
+    )
+
+    cmd = '''convert \
+    -density {density}\
+    -depth {depth}\
+    {input_path}[{page}]\
+    -background white\
+    {tmp_file_path}'''.format(
+        density=args['--density'],
+        depth=args['--depth'],
+        input_path=args['<input_path>'],
+        page=page_number,
+        tmp_file_path=tmp_file_path
+        )
+    os.system(cmd)
+
+    text_file_path = os.path.join(tmp_dir, '{page:010d}'.format(
+        page=page_number)
+    )
+
+    cmd = '''tesseract \
+    -psm {psm} \
+    {tmp_file_path} \
+    {text_file_path} \
+    > /dev/null 2>&1
+    '''.format(
+        psm=args['--psm'],
+        tmp_file_path=tmp_file_path,
+        text_file_path=text_file_path)
+    os.system(cmd)
 
 
 def main(args):
@@ -35,46 +75,11 @@ def main(args):
         dir='.'
     )
 
-    for page_number in trange(num_pages):
-        tmp_file_path = os.path.join(
-            tmp_dir,
-            '{page:010d}.{imageformat}'.format(
-                page=page_number,
-                imageformat=args['--imageformat']
-            )
-        )
+    Parallel(n_jobs=6)(
+        delayed(convert_one_page)(args, page_number, tmp_dir) for page_number in range(num_pages))
 
-        cmd = '''convert \
-        -density {density}\
-        -depth {depth}\
-        {input_path}[{page}]\
-        -background white\
-        {tmp_file_path}'''.format(
-            density=args['--density'],
-            depth=args['--depth'],
-            input_path=args['<input_path>'],
-            page=page_number,
-            tmp_file_path=tmp_file_path
-            )
-        os.system(cmd)
-
-        text_file_path = os.path.join(tmp_dir, '{page:010d}'.format(
-            page=page_number)
-        )
-
-        cmd = '''tesseract \
-        -psm {psm} \
-        {tmp_file_path} \
-        {text_file_path} \
-        > /dev/null 2>&1
-        '''.format(
-            psm=args['--psm'],
-            tmp_file_path=tmp_file_path,
-            text_file_path=text_file_path)
-        os.system(cmd)
-
-    with open(args['<output_path>'], 'wt') as outfile:
-        for path in sorted(glob(os.path.join(tmp_dir, '*.text'))):
+    with open(args['<output_path>'], 'w') as outfile:
+        for path in sorted(glob(os.path.join(tmp_dir, '*.txt'))):
             outfile.write(open(path).read())
 
 if __name__ == '__main__':
