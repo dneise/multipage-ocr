@@ -5,7 +5,7 @@ import os
 import getopt
 import string
 import random
-from pyPdf import PdfFileReader
+from PyPDF2 import PdfFileReader
 
 # usage
 def usage():
@@ -104,7 +104,7 @@ def main(argv):
                 else: raise
             created_dir_flag = True
         iteration += 1
-        print tmp_dir
+        print(tmp_dir)
 
     if not created_dir_flag:
         sys.exit('ERROR: Unable to create random temporary directory.')
@@ -127,7 +127,7 @@ def main(argv):
     # concatenate results and delete them
     text_files = " ".join([tmp_dir+"/"+str(x)+".txt" for x in xrange(0,num_pages)])
     cmd = "cat %s > %s" % (text_files, output_file)
-    print(Concatenate OCR outputs: " + cmd)
+    print("Concatenate OCR outputs: " + cmd)
     os.system(cmd)
 
     # cleanup
