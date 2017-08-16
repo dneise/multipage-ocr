@@ -1,35 +1,35 @@
 #!/usr/bin/env python
+"""Naval Fate.
 
+Usage:
+  multipage-ocr.py <input_file> <output_file> [options]
+
+Options:
+  --density N           dpi density to supply to ImageMagick convert [default: 300]
+  --depth N             bit depth [default: 8]
+  --imageformat FORMAT  image format (e.g., jpg, png, tif) [default: jpg]
+  --psm N               tesseract layout analysis mode [default: 3]
+  --quiet               tesseract quiet 0 or 1; defaults to 1
+  --clean               delete intermediate files; defaults to 1
+"""
+from docopt import docopt
 import sys
 import os
-import getopt
 import string
 import random
 from PyPDF2 import PdfFileReader
 
-# usage
-def usage():
-    print('Usage:\n\t%s [input_file]' % sys.argv[0])
-    print('Options:')
-    print('\t-i, --input [filename] input PDF to perform OCR on')
-    print('\t-o, --output [filename] optional name for output file; if not supplied, output is [input_basename]_ocr.txt')
-    print('\t-d, --density [number]     dpi density to supply to ImageMagick convert; defaults to 300')
-    print('\t-b, --depth [number]       bit depth; defaults to 8')
-    print('\t-f, --imageformat [format] image format (e.g., jpg, png, tif); defaults to jpg')
-    print('\t-p, --psm [number]     tesseract layout analysis mode, see man tesseract for more details; defaults to 3')
-    print('\t-q, --quiet [0 or 1]       tesseract quiet 0 or 1; defaults to 1')
-    print('\t-c, --clean [0 or 1]       delete intermediate files; defaults to 1')
 
-# check that an argument has been provided
-if len(sys.argv) < 2:
-    usage()
-    sys.exit()
+if __name__ == '__main__':
+    arguments = docopt(__doc__, version='Naval Fate 2.0')
+    print(arguments)
 
-# generate random string
+
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    ''' generate random string'''
     return ''.join(random.choice(chars) for x in range(size))
 
-# main method
+
 def main(argv):
 
     input_file = None
@@ -134,7 +134,3 @@ def main(argv):
     cmd = 'rm -r %s' % tmp_dir
     print("Cleanup temporary files: " + cmd)
     os.system(cmd)
-
-# invoke main
-if __name__ == "__main__":
-    main(sys.argv[1:])
