@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Naval Fate.
+"""multipage-ocr.py
 
 Usage:
   multipage-ocr.py <input_path> <output_path> [options]
@@ -78,6 +78,5 @@ def main(args):
             outfile.write(open(path).read())
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='Naval Fate 2.0')
-    print(args)
+    args = docopt(__doc__, version='multipage-ocr.py 1.0')
     main(args)
